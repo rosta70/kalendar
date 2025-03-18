@@ -1368,83 +1368,6 @@ document.querySelector('.calendar-container').addEventListener('touchend', e => 
     </div>
 </div>
 <script>
- // Funkce pro počítání poznámek - S DEBUGOVÁNÍM
- // Na začátek vašeho kódu pro počítání poznámek
-if (typeof notes === 'undefined' || notes === null) {
-    alert("Chyba: Proměnná 'notes' není definována nebo je null!");
-    // Vytvořit prázdný objekt, aby kód nespadl
-    notes = {};
-}
-console.log("Skript pro počítání poznámek se načítá");
-
-// Najít prvek tlačítka
-const countBtn = document.getElementById('count-notes-btn');
-console.log("Tlačítko pro počítání:", countBtn);
-
-// Přidat event listener s kontrolou
-if (countBtn) {
-    countBtn.addEventListener('click', function() {
-        console.log("Tlačítko pro počítání kliknuto");
-        
-        // Najít modální okno
-        const modal = document.getElementById('count-notes-modal');
-        console.log("Modální okno:", modal);
-        
-        if (modal) {
-            // Zobrazení modálního okna
-            modal.style.display = 'flex';
-            console.log("Modální okno by mělo být zobrazeno");
-            
-            // Nastavení výchozího časového období (celý aktuální měsíc)
-            const today = new Date();
-            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            
-            const startDateInput = document.getElementById('start-date');
-            const endDateInput = document.getElementById('end-date');
-            console.log("Vstupní pole pro data:", startDateInput, endDateInput);
-            
-            if (startDateInput && endDateInput) {
-                startDateInput.valueAsDate = firstDay;
-                endDateInput.valueAsDate = lastDay;
-            } else {
-                console.error("Vstupní pole pro data nebyla nalezena!");
-            }
-            
-            // Skrytí předchozího výsledku
-            const resultDiv = document.getElementById('count-result');
-            if (resultDiv) {
-                resultDiv.style.display = 'none';
-            } else {
-                console.error("Element pro výsledek nebyl nalezen!");
-            }
-        } else {
-            console.error("Modální okno nebylo nalezeno v DOM!");
-            alert("Chyba: Modální okno pro počítání poznámek neexistuje.");
-        }
-    });
-} else {
-    console.error("Tlačítko pro počítání poznámek nebylo nalezeno!");
-}
-
-// Zavření modálního okna
-const cancelBtn = document.getElementById('cancel-count');
-console.log("Tlačítko pro zavření:", cancelBtn);
-
-if (cancelBtn) {
-    cancelBtn.addEventListener('click', function() {
-        console.log("Tlačítko pro zavření kliknuto");
-        const modal = document.getElementById('count-notes-modal');
-        if (modal) {
-            modal.style.display = 'none';
-            console.log("Modální okno by mělo být skryto");
-        } else {
-            console.error("Modální okno nebylo nalezeno při zavírání!");
-        }
-    });
-} else {
-    console.error("Tlačítko pro zavření nebylo nalezeno!");
-}
 // Výpočet počtu poznámek
 document.getElementById('calculate-count').addEventListener('click', function() {
     const searchText = document.getElementById('search-text').value.trim().toLowerCase();
@@ -1502,25 +1425,21 @@ document.getElementById('calculate-count').addEventListener('click', function() 
     
     if (count > 0) {
         let resultHTML = `<p><strong>Nalezeno ${count} poznámek obsahujících "${searchText}":</strong></p>`;
-        resultHTML += '<ul style="margin-top: 5px; padding-left: 20px;">';
+        resultHTML += '<div style="max-height: 300px; overflow-y: auto; margin-top: 5px;">';
+        resultHTML += '<ul style="padding-left: 20px;">';
         
         // Seřazení nalezených poznámek podle data
         matchingNotes.sort((a, b) => new Date(a.date) - new Date(b.date));
         
-        // Zobrazení max. 10 položek
-        const displayNotes = matchingNotes.slice(0, 10);
-        
-        displayNotes.forEach(note => {
+        // Zobrazení všech nalezených poznámek
+        matchingNotes.forEach(note => {
             const date = new Date(note.date);
             const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
             resultHTML += `<li style="margin-bottom: 5px;"><span style="color: ${note.color}; font-weight: bold;">■</span> ${formattedDate}: ${note.title}</li>`;
         });
         
-        if (matchingNotes.length > 10) {
-            resultHTML += `<li>... a dalších ${matchingNotes.length - 10} poznámek</li>`;
-        }
-        
         resultHTML += '</ul>';
+        resultHTML += '</div>';
         resultDiv.innerHTML = resultHTML;
     } else {
         resultDiv.innerHTML = `<p>Nenalezeny žádné poznámky obsahující "${searchText}" v zadaném období.</p>`;
