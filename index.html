@@ -1339,7 +1339,8 @@ document.querySelector('.calendar-container').addEventListener('touchend', e => 
     }
 }
 </script>
- // Funkce pro počítání poznámek - S DEBUGOVÁNÍM
+<script>
+  // Funkce pro počítání poznámek - S DEBUGOVÁNÍM
  // Na začátek vašeho kódu pro počítání poznámek
 if (typeof notes === 'undefined' || notes === null) {
     alert("Chyba: Proměnná 'notes' není definována nebo je null!");
@@ -1473,25 +1474,21 @@ document.getElementById('calculate-count').addEventListener('click', function() 
     
     if (count > 0) {
         let resultHTML = `<p><strong>Nalezeno ${count} poznámek obsahujících "${searchText}":</strong></p>`;
-        resultHTML += '<ul style="margin-top: 5px; padding-left: 20px;">';
+        resultHTML += '<div style="max-height: 300px; overflow-y: auto; margin-top: 5px;">';
+        resultHTML += '<ul style="padding-left: 20px;">';
         
         // Seřazení nalezených poznámek podle data
         matchingNotes.sort((a, b) => new Date(a.date) - new Date(b.date));
         
-        // Zobrazení max. 10 položek
-        const displayNotes = matchingNotes.slice(0, 10);
-        
-        displayNotes.forEach(note => {
+        // Zobrazení všech nalezených poznámek
+        matchingNotes.forEach(note => {
             const date = new Date(note.date);
             const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
             resultHTML += `<li style="margin-bottom: 5px;"><span style="color: ${note.color}; font-weight: bold;">■</span> ${formattedDate}: ${note.title}</li>`;
         });
         
-        if (matchingNotes.length > 10) {
-            resultHTML += `<li>... a dalších ${matchingNotes.length - 10} poznámek</li>`;
-        }
-        
         resultHTML += '</ul>';
+        resultHTML += '</div>';
         resultDiv.innerHTML = resultHTML;
     } else {
         resultDiv.innerHTML = `<p>Nenalezeny žádné poznámky obsahující "${searchText}" v zadaném období.</p>`;
