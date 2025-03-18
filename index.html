@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalendář SJV</title>
+   
+    <input type="file" id="load-notes-file" accept="application/json" style="display: none;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#333">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <style>
+    .calendar-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-nav {
+    order: 1;
+    margin-bottom: 10px;
+}
+
+.note-switcher {
+    order: 2;
+}
+
+/* Pro mobilní responzivitu */
+@media (max-width: 768px) {
+    .calendar-nav, .note-switcher {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .calendar-nav button, .note-switcher button {
+        margin: 5px;
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+    
+.note-switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.note-btn {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background-color: #b300ff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.note-btnA {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background-color: #dca716;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 30px;
+}
+.note-btnB {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background-color: #bd1a1a;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 30px;
+}
+.note-btnC {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background-color: #4d16f2;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 30px;
+}
+.note-btnD {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background-color: #df07ea;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 30px;
+}
+.note-btn4 {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background-color: #07b1ea;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 30px;
+}
+.note-btnA:hover {
+    background-color: #2fd569;
+}
+.note-btnB:hover {
+    background-color: #2fd569;
+}
+.note-btnC:hover {
+    background-color: #2fd569;
+}
+.note-btnD:hover {
+    background-color: #2fd569;
+}
+.note-btn4:hover {
+    background-color: #2fd569;
+}
+nav ul {
+    list-style-type: none;
+    text-align: center;
+    padding: 10px 10px;
+    margin: 0;
+    background-color: white; /* Bílé pozadí */
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+nav li {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+nav a {
+    display: inline-block;
+    padding: 10px 18px;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* Efekt jemného zvednutí při najetí */
+nav a:hover {
+    background-color: #f0f0f0;
+    border-color: #bbb;
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.15);
+}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #525;
+            font-size: 30px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            font-size: 25px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+        
+        .calendar-container {
+            flex: 2;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .notes-container {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background-color: #2b9302;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn_u {
+            padding: 8px 16px;
+            background-color: #55b2e9;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn_n {
+            padding: 8px 16px;
+            background-color: #e360e1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+        
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .calendar th {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .calendar td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            height: 100px;
+            vertical-align: top;
+            position: relative;
+        }
+        
+        .calendar td:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .date-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .note-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 3px;
+        }
+        
+        .note-list {
+            margin-top: 5px;
+            font-size: 11px;
+            overflow: hidden;
+            max-height: 75px;
+        }
+        
+        .note-item {
+            margin-bottom: 3px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .note-form {
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .color-option {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-option.selected {
+            border-color: #333;
+        }
+        
+        .today {
+            background-color: #f0f8ff;
+        }
+        
+        .other-month {
+            color: #aaa;
+            background-color: #f8f8f8;
+        }
+        
+        .repeat-custom {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+        
+        /* Úpravy pro mobilní zobrazení kalendáře */
+@media (max-width: 768px) {
+    /* Úprava zobrazení kalendáře */
+    .calendar {
+        table-layout: fixed;
+        font-size: 0.9em;
+    }
+    
+    .calendar td {
+        height: 60px;  /* Omezená výška buněk */
+        padding: 4px;
+        max-width: 14.28%; /* 100% / 7 dní */
+        overflow: hidden;
+    }
+    
+    .date-number {
+        font-size: 12px;
+    }
+    
+    /* Omezení poznámek v buňkách */
+    .note-list {
+        max-height: 35px;
+        overflow: hidden;
+    }
+    
+    .note-item {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 9px;
+        padding: 1px 2px;
+        margin-bottom: 2px;
+    }
+    
+    /* Zvýraznění buňky při kliknutí pro lepší UX */
+    .calendar td:active {
+        background-color: rgba(76, 175, 80, 0.2);
+    }
+    
+    /* Možnost horizontálního scrollování celé tabulky */
+    .calendar-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+<!-- Upravené modální okno s jasně viditelnými styly -->
+<div id="count-notes-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background-color: white; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px; margin: 20% auto;">
+        <h3>Počítání poznámek</h3>
+        
+        <div style="margin: 10px 0;">
+            <label for="search-text">Hledaný text:</label>
+            <input type="text" id="search-text" placeholder="Zadejte text pro vyhledávání" style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <div style="margin: 10px 0;">
+            <label for="start-date">Od:</label>
+            <input type="date" id="start-date" style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <div style="margin: 10px 0;">
+            <label for="end-date">Do:</label>
+            <input type="date" id="end-date" style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <div id="count-result" style="display: none; margin-top: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 4px;"></div>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <button id="calculate-count" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px;">Spočítat</button>
+            <button id="cancel-count" style="padding: 10px 20px; background-color: #f44336; color: white; border: none; border-radius: 4px;">Zavřít</button>
+        </div>
+    </div>
+</div>
+    </style>
+    
+</head>
+<body>
+   
+    <h1>Kalendář - SJV 4S</h1>
+    <h2 id="current-month">Březen 2025</h2>
+    <div class="container">
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button id="count-notes-btn" class="btn_n">Spočítat poznámky</button>
+                    <button class="btn" id="prev-month">Předchozí</button>
+                    <button class="btn" id="next-month">Následující</button>
+                    <button id="save-notes" class="btn_u">Uložit</button>
+                    <button id="load-notes" class="btn_n">Načíst</button>
+
+                </div>
+                <div class="note-switcher">
+                    <button class="note-btnA" id="noteA">A</button>
+                    <button class="note-btnB" id="noteB">B</button>
+                    <button class="note-btnC" id="noteC">C</button>
+                    <button class="note-btnD" id="noteD">D</button>
+                    <button class="note-btn4" id="note4">C-3sm</button>
+                </div>
+                <div id="data-container"></div>
+                
+               
+            </div>
+            
+            <table class="calendar" id="calendar">
+                <thead>
+                    <tr>
+                        <th>Po</th>
+                        <th>Út</th>
+                        <th>St</th>
+                        <th>Čt</th>
+                        <th>Pá</th>
+                        <th>So</th>
+                        <th>Ne</th>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body">
+                    <!-- Kalendář bude generován JavaScriptem -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="notes-container">
+            <h2>Přidat poznámku</h2>
+            <form id="note-form" class="note-form">
+                <div class="form-group">
+                    <label for="note-date">Datum:</label>
+                    <input type="date" id="note-date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="note-title">Název:</label>
+                    <input type="text" id="note-title" placeholder="Název poznámky" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="note-description">Popis:</label>
+                    <textarea id="note-description" placeholder="Popis poznámky"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="note-repeat">Opakování:</label>
+                    <select id="note-repeat">
+                        <option value="none">Bez opakování</option>
+                        <option value="daily">Denně</option>
+                        <option value="weekly">Týdně</option>
+                        <option value="biweekly">Ob týden</option>
+                        <option value="monthly">Měsíčně</option>
+                        <option value="yearly">Ročně</option>
+                        <option value="custom">Každý X-tý den</option>
+                    </select>
+                    
+                    <div id="repeat-custom" class="repeat-custom">
+                        <label for="repeat-days">Opakovat každý:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="repeat-days" min="2" value="2" style="width: 80px;">
+                            <span>den</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Barva:</label>
+                    <div class="color-picker">
+                        <div class="color-option selected" style="background-color: #4CAF50;" data-color="#4CAF50"></div>
+                        <div class="color-option" style="background-color: #2196F3;" data-color="#2196F3"></div>
+                        <div class="color-option" style="background-color: #f44336;" data-color="#f44336"></div>
+                        <div class="color-option" style="background-color: #FF9800;" data-color="#FF9800"></div>
+                        <div class="color-option" style="background-color: #9C27B0;" data-color="#9C27B0"></div>
+                    </div>
+                    <input type="hidden" id="note-color" value="#4CAF50">
+                </div>
+                
+                <button type="submit" class="btn">Přidat poznámku</button>
+            </form>
+            
+            <div id="selected-day-notes" style="margin-top: 30px;">
+                <h2>Poznámky pro vybraný den</h2>
+                <div id="notes-list">
+                    Klikněte na den v kalendáři pro zobrazení poznámek.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Globální proměnné
+let currentDate = new Date();
+let selectedDate = new Date(currentDate);
+let notes = JSON.parse(localStorage.getItem('calendar-notes')) || {};
+let selectDateFunction; // Globální deklarace funkce selectDate
+
+// Funkce pro aktualizaci kalendáře
+function updateCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Aktualizace nadpisu měsíce
+    const monthNames = ['Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 
+                      'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'];
+    document.getElementById('current-month').textContent = `${monthNames[month]} ${year}`;
+    
+    // Nastavení prvního dne měsíce
+    const firstDay = new Date(year, month, 1);
+    // Získání počtu dní v měsíci
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Získání dne v týdnu pro první den měsíce (0 = neděle, 1 = pondělí, ...)
+    let firstDayOfWeek = firstDay.getDay();
+    // Upravení pro začátek týdne v pondělí
+    firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+    
+    // Vyčištění těla kalendáře
+    const calendarBody = document.getElementById('calendar-body');
+    calendarBody.innerHTML = '';
+    
+    // Vytvoření buněk kalendáře
+    let date = 1;
+    let nextMonthDate = 1;
+    
+    // Získání počtu dní v předchozím měsíci
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    
+    // Vytvoření řádků kalendáře (obvykle 6 týdnů)
+    for (let i = 0; i < 6; i++) {
+        // Vytvoření řádku
+        const row = document.createElement('tr');
+        
+        // Vytvoření buněk pro dny v týdnu
+        for (let j = 0; j < 7; j++) {
+            const cell = document.createElement('td');
+            
+            if (i === 0 && j < firstDayOfWeek) {
+                // Dny z předchozího měsíce
+                const prevMonthDay = daysInPrevMonth - (firstDayOfWeek - j - 1);
+                const prevMonth = month === 0 ? 11 : month - 1;
+                const prevYear = month === 0 ? year - 1 : year;
+                
+                cell.innerHTML = `<div class="date-number">${prevMonthDay}</div>`;
+                cell.classList.add('other-month');
+                cell.setAttribute('data-date', `${prevYear}-${(prevMonth + 1).toString().padStart(2, '0')}-${prevMonthDay.toString().padStart(2, '0')}`);
+            } else if (date > daysInMonth) {
+                // Dny z následujícího měsíce
+                const nextMonth = month === 11 ? 0 : month + 1;
+                const nextYear = month === 11 ? year + 1 : year;
+                
+                cell.innerHTML = `<div class="date-number">${nextMonthDate}</div>`;
+                cell.classList.add('other-month');
+                cell.setAttribute('data-date', `${nextYear}-${(nextMonth + 1).toString().padStart(2, '0')}-${nextMonthDate.toString().padStart(2, '0')}`);
+                nextMonthDate++;
+            } else {
+                // Dny aktuálního měsíce
+                cell.innerHTML = `<div class="date-number">${date}</div>`;
+                
+                // Označení dnešního dne
+                const today = new Date();
+                if (date === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    cell.classList.add('today');
+                }
+                
+                // Přidání data jako atributu
+                const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
+                cell.setAttribute('data-date', dateStr);
+                
+                // Přidání poznámek pro tento den
+                const dayNotes = getNotesForDate(dateStr);
+                if (dayNotes.length > 0) {
+                    const noteList = document.createElement('div');
+                    noteList.className = 'note-list';
+                    
+                    dayNotes.forEach(note => {
+                        const noteItem = document.createElement('div');
+                        noteItem.className = 'note-item';
+                        noteItem.style.backgroundColor = note.color + '33'; // Přidání průhlednosti
+                        noteItem.style.borderLeft = `3px solid ${note.color}`;
+                        noteItem.textContent = note.title;
+                        noteItem.setAttribute('data-id', note.id);
+                        noteList.appendChild(noteItem);
+                    });
+                    
+                    cell.appendChild(noteList);
+                }
+                
+                date++;
+            }
+            // Přidání události kliknutí na buňku
+            cell.addEventListener('click', function() {
+                selectDate(this.getAttribute('data-date'));
+            });
+            
+            row.appendChild(cell);
+        }
+        
+        calendarBody.appendChild(row);
+        
+        // Pokud jsme již zobrazili všechny dny měsíce, přerušíme cyklus
+        if (date > daysInMonth && i >= 4) break;
+    }
+    
+    // Nastavení výchozího datumu ve formuláři na aktuální datum
+    const today = new Date();
+    document.getElementById('note-date').valueAsDate = today;
+}
+
+// Funkce pro získání poznámek pro datum
+function getNotesForDate(dateStr) {
+    const result = [];
+    
+    // Přímé poznámky pro tento den
+    if (notes[dateStr]) {
+        result.push(...notes[dateStr]);
+    }
+    
+    // Opakující se poznámky
+    const targetDate = new Date(dateStr);
+    
+    // Projít všechny poznámky a zkontrolovat opakování
+    Object.keys(notes).forEach(date => {
+        notes[date].forEach(note => {
+            if (note.repeat !== 'none' && dateStr !== date) {
+                const noteDate = new Date(date);
+                
+                // Kontrola podle typu opakování
+                let shouldShow = false;
+                
+                switch (note.repeat) {
+                    case 'daily':
+                        shouldShow = true;
+                        break;
+                        
+                    case 'weekly':
+                        shouldShow = noteDate.getDay() === targetDate.getDay() && 
+                                      targetDate > noteDate;
+                        break;
+                        
+                    case 'biweekly':
+                        const diffTime = Math.abs(targetDate - noteDate);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        shouldShow = noteDate.getDay() === targetDate.getDay() && 
+                                      (diffDays % 14 === 0) &&
+                                      targetDate > noteDate;
+                        break;
+                        
+                    case 'monthly':
+                        shouldShow = noteDate.getDate() === targetDate.getDate() && 
+                                      (targetDate.getMonth() !== noteDate.getMonth() || 
+                                       targetDate.getFullYear() !== noteDate.getFullYear());
+                        break;
+                        
+                    case 'yearly':
+                        shouldShow = noteDate.getDate() === targetDate.getDate() && 
+                                      noteDate.getMonth() === targetDate.getMonth() && 
+                                      targetDate.getFullYear() !== noteDate.getFullYear();
+                        break;
+                        
+                    case 'custom':
+                        if (targetDate > noteDate && note.repeatDays) {
+                            const diffTime = Math.abs(targetDate - noteDate);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            shouldShow = diffDays % note.repeatDays === 0;
+                        }
+                        break;
+                }
+                
+                if (shouldShow) {
+                    // Vytvořit kopii poznámky pro opakování
+                    const repeatNote = {...note};
+                    repeatNote.isRepeat = true;
+                    repeatNote.originalDate = date;
+                    result.push(repeatNote);
+                }
+            }
+        });
+    });
+    
+    return result;
+}
+
+// Inicializace eventu pro načítání poznámek
+document.getElementById('save-notes').addEventListener('click', function() {
+    const notes = localStorage.getItem('calendar-notes');
+    if (!notes) {
+        alert('Žádné poznámky k uložení.');
+        return;
+    }
+
+    // Vytvoření aktuálního data a času pro název souboru
+    const now = new Date();
+    const dateStr = now.getFullYear() + 
+                   '_' + (now.getMonth() + 1).toString().padStart(2, '0') + 
+                   '_' + now.getDate().toString().padStart(2, '0');
+    const timeStr = now.getHours().toString().padStart(2, '0') + 
+                   '_' + now.getMinutes().toString().padStart(2, '0') + 
+                   '_' + now.getSeconds().toString().padStart(2, '0');
+    
+    // Vytvoření defaultního názvu souboru
+    const defaultFileName = `Kalendar_${dateStr}_${timeStr}.json`;
+    
+    // Vytvoření dialogového okna jako modální okno
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    modal.style.zIndex = '9999'; // Vyšší z-index než u předchozí verze
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    
+    // Vytvoření obsahu dialogu
+    const modalContent = document.createElement('div');
+    modalContent.style.backgroundColor = 'white';
+    modalContent.style.padding = '20px';
+    modalContent.style.borderRadius = '5px';
+    modalContent.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+    modalContent.style.width = '350px';
+    modalContent.style.maxWidth = '90%';
+    
+    // Vytvoření popisku
+    const label = document.createElement('div');
+    label.textContent = 'Zadejte název souboru:';
+    label.style.fontWeight = 'bold';
+    label.style.marginBottom = '10px';
+    
+    // Vytvoření inputu pro název souboru
+    const filenameInput = document.createElement('input');
+    filenameInput.type = 'text';
+    filenameInput.value = defaultFileName;
+    filenameInput.style.width = '100%';
+    filenameInput.style.padding = '8px';
+    filenameInput.style.boxSizing = 'border-box';
+    filenameInput.style.marginBottom = '15px';
+    filenameInput.style.border = '1px solid #ddd';
+    filenameInput.style.borderRadius = '4px';
+    
+    // Vytvoření tlačítek
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'flex-end';
+    buttonContainer.style.gap = '10px';
+    
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'Zrušit';
+    cancelButton.className = 'btn';
+    cancelButton.style.backgroundColor = '#f44336';
+    
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Uložit';
+    saveButton.className = 'btn';
+    
+    // Sestavení struktury dialogu
+    buttonContainer.appendChild(cancelButton);
+    buttonContainer.appendChild(saveButton);
+    
+    modalContent.appendChild(label);
+    modalContent.appendChild(filenameInput);
+    modalContent.appendChild(buttonContainer);
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Zaměření na input pro zadání názvu
+    setTimeout(() => {
+        filenameInput.focus();
+        filenameInput.select();
+    }, 100);
+    
+    // Funkce pro ulození souboru pomocí Blob API a stažení
+    function saveFile() {
+        let filename = filenameInput.value.trim();
+        
+        // Přidání přípony .json, pokud chybí
+        if (!filename.toLowerCase().endsWith('.json')) {
+            filename += '.json';
+        }
+        
+        // Odstranění dialogu před zobrazením prohlížečového dialogu
+        document.body.removeChild(modal);
+        
+        // Krátká pauza před spuštěním stahování
+        setTimeout(() => {
+            const blob = new Blob([notes], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }, 100);
+    }
+    
+    // Funkce pro zrušení
+    function cancel() {
+        document.body.removeChild(modal);
+    }
+    
+    // Event listenery pro tlačítka
+    saveButton.addEventListener('click', saveFile);
+    cancelButton.addEventListener('click', cancel);
+    
+    // Umožnit uložení stisknutím Enter
+    filenameInput.addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            saveFile();
+        } else if (event.key === 'Escape') {
+            cancel();
+        }
+    });
+    
+    // Umožnit zrušení kliknutím mimo dialog, ale jen na pozadí
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            cancel();
+        }
+    });
+});
+
+document.getElementById('load-notes').addEventListener('click', function() {
+    document.getElementById('load-notes-file').click();
+});
+
+document.getElementById('load-notes-file').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const loadedNotes = JSON.parse(e.target.result);
+            notes = loadedNotes; // Přiřazení do globální proměnné notes
+            localStorage.setItem('calendar-notes', JSON.stringify(loadedNotes));
+            
+            // Aktualizujeme kalendář
+            updateCalendar();
+            
+            // OPRAVA: Vybereme aktuální den po načtení poznámek
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+            selectDate(todayStr);
+            
+            alert('Poznámky byly úspěšně načteny.');
+        } catch (error) {
+            alert('Chyba při načítání souboru. Ujistěte se, že jde o správný formát JSON.');
+        }
+    };
+    reader.readAsText(file);
+});
+
+// DOMContentLoaded event s ostatními funkcemi
+document.addEventListener('DOMContentLoaded', function() {
+   
+    // Inicializace kalendáře
+    updateCalendar();
+    
+    // Event listenery
+    document.getElementById('prev-month').addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateCalendar();
+    });
+    
+    document.getElementById('next-month').addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        updateCalendar();
+    });
+    
+    document.getElementById('note-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addNote();
+    });
+    
+    // Zobrazení/skrytí pole pro vlastní opakování
+    document.getElementById('note-repeat').addEventListener('change', function() {
+        const customRepeatDiv = document.getElementById('repeat-custom');
+        if (this.value === 'custom') {
+            customRepeatDiv.style.display = 'block';
+        } else {
+            customRepeatDiv.style.display = 'none';
+        }
+    });
+    
+    // Color picker
+    document.querySelectorAll('.color-option').forEach(function(option) {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            document.getElementById('note-color').value = this.getAttribute('data-color');
+        });
+    });
+    
+    // DŮLEŽITÁ ZMĚNA: Definice funkce selectDate v globálním kontextu
+    // Nyní je funkce přístupná i pro načítání ze souboru
+    window.selectDate = function(dateStr) {
+        selectedDate = new Date(dateStr);
+        document.getElementById('note-date').value = dateStr;
+        
+        // Zobrazení poznámek pro vybraný den
+        displayNotesForDate(dateStr);
+        
+        // Označení vybraného dne v kalendáři
+        document.querySelectorAll('#calendar td').forEach(cell => {
+            cell.style.outline = 'none';
+            if (cell.getAttribute('data-date') === dateStr) {
+                cell.style.outline = '2px solid #4CAF50';
+            }
+        });
+    }
+    
+    // Funkce pro zobrazení poznámek pro vybraný den
+    function displayNotesForDate(dateStr) {
+        const notesList = document.getElementById('notes-list');
+        notesList.innerHTML = '';
+        
+        const dayNotes = getNotesForDate(dateStr);
+        
+        if (dayNotes.length === 0) {
+            notesList.textContent = 'Žádné poznámky pro tento den.';
+            return;
+        }
+        
+        dayNotes.forEach(note => {
+            const noteDiv = document.createElement('div');
+            noteDiv.style.marginBottom = '15px';
+            noteDiv.style.padding = '10px';
+            noteDiv.style.borderLeft = `4px solid ${note.color}`;
+            noteDiv.style.backgroundColor = '#f9f9f9';
+            
+            const noteTitle = document.createElement('h3');
+            noteTitle.style.margin = '0 0 5px 0';
+            noteTitle.textContent = note.title;
+            
+            const noteDesc = document.createElement('p');
+            noteDesc.style.margin = '0 0 10px 0';
+            noteDesc.textContent = note.description || 'Bez popisu';
+            
+            const noteInfo = document.createElement('div');
+            noteInfo.style.fontSize = '12px';
+            noteInfo.style.color = '#666';
+            
+            let repeatInfo = '';
+            switch (note.repeat) {
+                case 'none': repeatInfo = 'Bez opakování'; break;
+                case 'daily': repeatInfo = 'Opakuje se denně'; break;
+                case 'weekly': repeatInfo = 'Opakuje se týdně'; break;
+                case 'biweekly': repeatInfo = 'Opakuje se ob týden'; break;
+                case 'monthly': repeatInfo = 'Opakuje se měsíčně'; break;
+                case 'yearly': repeatInfo = 'Opakuje se ročně'; break;
+                case 'custom': repeatInfo = `Opakuje se každý ${note.repeatDays}. den`; break;
+            }
+            
+            if (note.isRepeat) {
+                noteInfo.textContent = `${repeatInfo} (původní datum: ${formatDate(new Date(note.originalDate))})`;
+            } else {
+                noteInfo.textContent = repeatInfo;
+            }
+            
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.style.marginTop = '10px';
+            
+            // Tlačítko pro úpravu pouze pokud nejde o opakující se instanci
+            if (!note.isRepeat) {
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Upravit';
+                editBtn.className = 'btn';
+                editBtn.style.marginRight = '5px';
+                editBtn.style.backgroundColor = '#2196F3';
+                editBtn.addEventListener('click', function() {
+                    editNote(note, dateStr);
+                });
+                buttonsDiv.appendChild(editBtn);
+            }
+            
+            // Tlačítko pro smazání
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = note.isRepeat ? 'Odstranit všechna opakování' : 'Odstranit';
+            deleteBtn.className = 'btn';
+            deleteBtn.style.backgroundColor = '#f44336';
+            deleteBtn.addEventListener('click', function() {
+                if (note.isRepeat) {
+                    deleteNote(note.id, note.originalDate);
+                } else {
+                    deleteNote(note.id, dateStr);
+                }
+            });
+            buttonsDiv.appendChild(deleteBtn);
+            
+            noteDiv.appendChild(noteTitle);
+            noteDiv.appendChild(noteDesc);
+            noteDiv.appendChild(noteInfo);
+            noteDiv.appendChild(buttonsDiv);
+            
+            notesList.appendChild(noteDiv);
+        });
+    }
+    
+    // Funkce pro přidání nové poznámky
+    function addNote() {
+        const dateInput = document.getElementById('note-date');
+        const titleInput = document.getElementById('note-title');
+        const descInput = document.getElementById('note-description');
+        const repeatSelect = document.getElementById('note-repeat');
+        const colorInput = document.getElementById('note-color');
+        
+        const dateStr = dateInput.value;
+        const title = titleInput.value.trim();
+        const description = descInput.value.trim();
+        const repeat = repeatSelect.value;
+        const color = colorInput.value;
+        
+        if (!dateStr || !title) return;
+        
+        // Vytvoření nové poznámky
+        const newNote = {
+            id: generateId(),
+            title: title,
+            description: description,
+            repeat: repeat,
+            color: color,
+            createdAt: new Date().toISOString()
+        };
+        
+        // Přidání počtu dní pro vlastní opakování
+        if (repeat === 'custom') {
+            const repeatDays = parseInt(document.getElementById('repeat-days').value);
+            if (repeatDays >= 2) {
+                newNote.repeatDays = repeatDays;
+            } else {
+                alert('Počet dní pro opakování musí být alespoň 2.');
+                return;
+            }
+        }
+        
+        // Přidání poznámky do úložiště
+        if (!notes[dateStr]) {
+            notes[dateStr] = [];
+        }
+        
+        notes[dateStr].push(newNote);
+        saveNotes();
+        
+        // Aktualizace kalendáře
+        updateCalendar();
+        
+        // Zobrazení poznámek pro vybraný den
+        displayNotesForDate(dateStr);
+        
+        // Vyčištění formuláře
+        titleInput.value = '';
+        descInput.value = '';
+        repeatSelect.value = 'none';
+        document.getElementById('repeat-custom').style.display = 'none';
+    }
+    
+    // Funkce pro úpravu poznámky
+    function editNote(note, dateStr) {
+        document.getElementById('note-title').value = note.title;
+        document.getElementById('note-description').value = note.description || '';
+        document.getElementById('note-repeat').value = note.repeat;
+        document.getElementById('note-color').value = note.color;
+        
+        // Nastavení vlastního opakování pokud je potřeba
+        if (note.repeat === 'custom') {
+            document.getElementById('repeat-custom').style.display = 'block';
+            document.getElementById('repeat-days').value = note.repeatDays || 2;
+        } else {
+            document.getElementById('repeat-custom').style.display = 'none';
+        }
+        
+        // Označení vybrané barvy
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.classList.remove('selected');
+            if (option.getAttribute('data-color') === note.color) {
+                option.classList.add('selected');
+            }
+        });
+        
+        // Odstranění staré poznámky
+        deleteNote(note.id, dateStr, false);
+        
+        // Přesunout focus na tlačítko odeslání
+        document.querySelector('#note-form button[type="submit"]').focus();
+    }
+    
+    // Funkce pro smazání poznámky
+    function deleteNote(noteId, dateStr, update = true) {
+        if (notes[dateStr]) {
+            notes[dateStr] = notes[dateStr].filter(note => note.id !== noteId);
+            
+            // Pokud nezbyly žádné poznámky pro tento den, odstraníme klíč
+            if (notes[dateStr].length === 0) {
+                delete notes[dateStr];
+            }
+            
+            saveNotes();
+            
+            if (update) {
+                // Aktualizace kalendáře
+                updateCalendar();
+                
+               // Znovu zobrazit poznámky pro vybraný den
+               displayNotesForDate(document.getElementById('note-date').value);
+            }
+        }
+    }
+    
+    // Po načtení stránky vybereme aktuální den
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    selectDate(todayStr);
+});
+
+// Pomocné funkce
+function saveNotes() {
+    localStorage.setItem('calendar-notes', JSON.stringify(notes));
+}
+
+function formatDate(date) {
+    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+}
+
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+   
+    </script>
+<script>
+    const jsonDataC = [
+    { "date": "2025-03-13", "title": "1.R.-C", "description": "1 ranní směna C", "repeat": "custom", "color": "#2196F3", "createdAt": "2025-03-13T11:14:48.920Z", "repeatDays": 8 },
+    { "date": "2025-03-14", "title": "2.R.-C", "description": "2 ranní směna C", "repeat": "custom", "color": "#2196F3", "createdAt": "2025-03-13T11:15:50.354Z", "repeatDays": 8 },
+    { "date": "2025-03-15", "title": "1.N.-C", "description": "1 noční směna C", "repeat": "custom", "color": "#2196F3", "createdAt": "2025-03-13T11:16:52.735Z", "repeatDays": 8 },
+    { "date": "2025-03-16", "title": "2.N.-C", "description": "2 noční směna C", "repeat": "custom", "color": "#2196F3", "createdAt": "2025-03-13T11:17:29.088Z", "repeatDays": 8 },
+    { "date": "2025-03-17", "title": "1.O.-C", "description": "1 odpolední směna C", "repeat": "custom", "color": "#2196F3", "createdAt": "2025-03-13T11:18:39.616Z", "repeatDays": 8 },
+    { "date": "2025-03-18", "title": "2.O.-C", "description": "2 odpolední směna C", "repeat": "custom", "color": "#2196F3", "createdAt": "2025-03-13T11:20:21.730Z", "repeatDays": 8 },
+    { "date": "2025-03-19", "title": "1.V.-C", "description": "1 volno směna C", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:21:07.041Z", "repeatDays": 8 },
+    { "date": "2025-03-20", "title": "2.V.-C", "description": "2 volno směna C", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:22:39.534Z", "repeatDays": 8 }
+];
+    const jsonDataB = [ 
+    { "date": "2025-03-15", "title": "1.R.-B", "description": "1 ranní směna B", "repeat": "custom", "color": "#bd1a1a", "createdAt": "2025-03-13T11:14:48.920Z", "repeatDays": 8 },
+    { "date": "2025-03-16", "title": "2.R.-B", "description": "2 ranní směna B", "repeat": "custom", "color": "#bd1a1a", "createdAt": "2025-03-13T11:15:50.354Z", "repeatDays": 8 },
+    { "date": "2025-03-17", "title": "1.N.-B", "description": "1 noční směna B", "repeat": "custom", "color": "#bd1a1a", "createdAt": "2025-03-13T11:16:52.735Z", "repeatDays": 8 },
+    { "date": "2025-03-18", "title": "2.N.-B", "description": "2 noční směna B", "repeat": "custom", "color": "#bd1a1a", "createdAt": "2025-03-13T11:17:29.088Z", "repeatDays": 8 },
+    { "date": "2025-03-19", "title": "1.O.-B", "description": "1 odpolední směna B", "repeat": "custom", "color": "#bd1a1a", "createdAt": "2025-03-13T11:18:39.616Z", "repeatDays": 8 },
+    { "date": "2025-03-20", "title": "2.O.-B", "description": "2 odpolední směna B", "repeat": "custom", "color": "#bd1a1a", "createdAt": "2025-03-13T11:20:21.730Z", "repeatDays": 8 },
+    { "date": "2025-03-21", "title": "1.V.-B", "description": "1 volno směna B", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:21:07.041Z", "repeatDays": 8 },
+    { "date": "2025-03-22", "title": "2.V.-B", "description": "2 volno směna B", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:22:39.534Z", "repeatDays": 8 }
+];
+    const jsonDataA = [
+    { "date": "2025-03-09", "title": "1.R.-A", "description": "1 ranní směna A", "repeat": "custom", "color": "#dca716", "createdAt": "2025-03-13T11:14:48.920Z", "repeatDays": 8 },
+    { "date": "2025-03-10", "title": "2.R.-A", "description": "2 ranní směna A", "repeat": "custom", "color": "#dca716", "createdAt": "2025-03-13T11:15:50.354Z", "repeatDays": 8 },
+    { "date": "2025-03-11", "title": "1.N.-A", "description": "1 noční směna A", "repeat": "custom", "color": "#dca716", "createdAt": "2025-03-13T11:16:52.735Z", "repeatDays": 8 },
+    { "date": "2025-03-12", "title": "2.N.-A", "description": "2 noční směna A", "repeat": "custom", "color": "#dca716", "createdAt": "2025-03-13T11:17:29.088Z", "repeatDays": 8 },
+    { "date": "2025-03-13", "title": "1.O.-A", "description": "1 odpolední směna A", "repeat": "custom", "color": "#dca716", "createdAt": "2025-03-13T11:18:39.616Z", "repeatDays": 8 },
+    { "date": "2025-03-14", "title": "2.O.-A", "description": "2 odpolední směna A", "repeat": "custom", "color": "#dca716", "createdAt": "2025-03-13T11:20:21.730Z", "repeatDays": 8 },
+    { "date": "2025-03-15", "title": "1.V.-A", "description": "1 volno směna A", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:21:07.041Z", "repeatDays": 8 },
+    { "date": "2025-03-16", "title": "2.V.-A", "description": "2 volno směna A", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:22:39.534Z", "repeatDays": 8 }
+];
+    const jsonDataD = [
+    { "date": "2025-03-11", "title": "1.R.-D", "description": "1 ranní směna D", "repeat": "custom", "color": "#df07ea", "createdAt": "2025-03-13T11:14:48.920Z", "repeatDays": 8 },
+    { "date": "2025-03-12", "title": "2.R.-D", "description": "2 ranní směna D", "repeat": "custom", "color": "#df07ea", "createdAt": "2025-03-13T11:15:50.354Z", "repeatDays": 8 },
+    { "date": "2025-03-13", "title": "1.N.-D", "description": "1 noční směna D", "repeat": "custom", "color": "#df07ea", "createdAt": "2025-03-13T11:16:52.735Z", "repeatDays": 8 },
+    { "date": "2025-03-14", "title": "2.N.-D", "description": "2 noční směna D", "repeat": "custom", "color": "#df07ea", "createdAt": "2025-03-13T11:17:29.088Z", "repeatDays": 8 },
+    { "date": "2025-03-15", "title": "1.O.-D", "description": "1 odpolední směna D", "repeat": "custom", "color": "#df07ea", "createdAt": "2025-03-13T11:18:39.616Z", "repeatDays": 8 },
+    { "date": "2025-03-16", "title": "2.O.-D", "description": "2 odpolední směna D", "repeat": "custom", "color": "#df07ea", "createdAt": "2025-03-13T11:20:21.730Z", "repeatDays": 8 },
+    { "date": "2025-03-17", "title": "1.V.-D", "description": "1 volno směna D", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:21:07.041Z", "repeatDays": 8 },
+    { "date": "2025-03-18", "title": "2.V.-D", "description": "2 volno směna D", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:22:39.534Z", "repeatDays": 8 }
+];
+    const jsonData4 = [
+    { "date": "2025-01-18", "title": "1.R.-C", "description": "1 ranní směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:14:48.920Z", "repeatDays": 24 },
+    { "date": "2025-01-19", "title": "2.R.-C", "description": "2 ranní směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:15:50.354Z", "repeatDays": 24 },
+    { "date": "2025-01-20", "title": "1.N.-C", "description": "1 noční směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:16:52.735Z", "repeatDays": 24 },
+    { "date": "2025-01-21", "title": "2.N.-C", "description": "2 noční směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:17:29.088Z", "repeatDays": 24 },
+    { "date": "2025-01-22", "title": "1.O.-C", "description": "1 odpolední směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:18:39.616Z", "repeatDays": 24 },
+    { "date": "2025-01-23", "title": "2.O.-C", "description": "2 odpolední směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:20:21.730Z", "repeatDays": 24 },
+    { "date": "2025-01-24", "title": "1.V.-C", "description": "1 volno směna C", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:21:07.041Z", "repeatDays": 8 },
+    { "date": "2025-01-25", "title": "2.V.-C", "description": "2 volno směna C", "repeat": "custom", "color": "#4CAF50", "createdAt": "2025-03-13T11:22:39.534Z", "repeatDays": 8 },
+    { "date": "2025-01-26", "title": "1.N.-C", "description": "1 noční směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:16:52.735Z", "repeatDays": 24 },
+    { "date": "2025-01-27", "title": "2.N.-C", "description": "2 noční směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:17:29.088Z", "repeatDays": 24 },
+    { "date": "2025-01-28", "title": "1.O.-C", "description": "1 odpolední směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:18:39.616Z", "repeatDays": 24 },
+    { "date": "2025-01-29", "title": "2.O.-C", "description": "2 odpolední směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:20:21.730Z", "repeatDays": 24 },
+    { "date": "2025-01-30", "title": "1.R.-C", "description": "1 ranní směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:14:48.920Z", "repeatDays": 24 },
+    { "date": "2025-01-31", "title": "2.R.-C", "description": "2 ranní směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:15:50.354Z", "repeatDays": 24 },
+    { "date": "2025-02-03", "title": "1.O.-C", "description": "1 odpolední směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:18:39.616Z", "repeatDays": 24 },
+    { "date": "2025-02-04", "title": "2.O.-C", "description": "2 odpolední směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:20:21.730Z", "repeatDays": 24 },
+    { "date": "2025-02-05", "title": "1.R.-C", "description": "1 ranní směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:14:48.920Z", "repeatDays": 24 },
+    { "date": "2025-02-06", "title": "2.R.-C", "description": "2 ranní směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:15:50.354Z", "repeatDays": 24 },
+    { "date": "2025-02-07", "title": "1.N.-C", "description": "1 noční směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:16:52.735Z", "repeatDays": 24 },
+    { "date": "2025-02-08", "title": "2.N.-C", "description": "2 noční směna C", "repeat": "custom", "color": "#1806e1", "createdAt": "2025-03-13T11:17:29.088Z", "repeatDays": 24 },
+    
+
+];
+function nactiData(data) {
+    // Nejdříve odstraníme existující směnové poznámky (zachováme ostatní)
+    for (let dateKey in notes) {
+        if (notes[dateKey]) {
+            // Filtrujeme pouze poznámky, které nemají v názvu indikátor směny
+            notes[dateKey] = notes[dateKey].filter(note => 
+                !note.title.includes('.R.-') && 
+                !note.title.includes('.N.-') && 
+                !note.title.includes('.O.-') && 
+                !note.title.includes('.V.-')
+            );
+            
+            // Pokud nezbyly žádné poznámky pro tento den, odstraníme klíč
+            if (notes[dateKey].length === 0) {
+                delete notes[dateKey];
+            }
+        }
+    }
+
+    // Nyní přidáme nové směnové poznámky
+    data.forEach(item => {
+        const date = item.date;
+        if (!notes[date]) {
+            notes[date] = [];
+        }
+        notes[date].push({
+            id: generateId(),
+            title: item.title,
+            description: item.description,
+            repeat: item.repeat || 'none',
+            color: item.color || '#000',
+            createdAt: item.createdAt || new Date().toISOString(),
+            repeatDays: item.repeatDays || 0
+        });
+    });
+
+    saveNotes(); // Uloží poznámky do localStorage
+    updateCalendar(); // Aktualizuje zobrazení kalendáře
+    
+    // Znovu zobrazí poznámky pro aktuálně vybraný den
+    const selectedDateStr = document.getElementById('note-date').value;
+    displayNotesForDate(selectedDateStr);
+}
+
+
+    document.getElementById('noteA').addEventListener('click', () => nactiData(jsonDataA));
+    document.getElementById('noteB').addEventListener('click', () => nactiData(jsonDataB));
+    document.getElementById('noteC').addEventListener('click', () => nactiData(jsonDataC));
+    document.getElementById('noteD').addEventListener('click', () => nactiData(jsonDataD));
+    document.getElementById('note4').addEventListener('click', () => nactiData(jsonData4));
+</script>
+<script>
+  // Registrace service workeru
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service worker registered!', reg))
+        .catch(err => console.log('Service worker registration failed:', err));
+    });
+  }
+  // Přidejte na konec vašeho skriptu
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.querySelector('.calendar-container').addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+
+document.querySelector('.calendar-container').addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+});
+
+//function handleSwipe() {
+    const minSwipeDistance = 50;
+    if (touchEndX < touchStartX - minSwipeDistance) {
+        // Swipe doleva - další měsíc
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        updateCalendar();
+    }
+    if (touchEndX > touchStartX + minSwipeDistance) {
+        // Swipe doprava - předchozí měsíc
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateCalendar();
+    }
+}
+</script>
+<!-- Modální okno pro počítání poznámek -->
+<div id="count-notes-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background-color: white; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px;">
+        <h3>Počítání poznámek</h3>
+        
+        <div class="form-group">
+            <label for="search-text">Hledaný text:</label>
+            <input type="text" id="search-text" placeholder="Zadejte text pro vyhledávání">
+        </div>
+        
+        <div class="form-group">
+            <label for="start-date">Od:</label>
+            <input type="date" id="start-date">
+        </div>
+        
+        <div class="form-group">
+            <label for="end-date">Do:</label>
+            <input type="date" id="end-date">
+        </div>
+        
+        <div id="count-result" style="display: none; margin-top: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 4px;"></div>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <button id="calculate-count" class="btn">Spočítat</button>
+            <button id="cancel-count" class="btn" style="background-color: #f44336;">Zavřít</button>
+        </div>
+    </div>
+</div>
+<script>
+ // Funkce pro počítání poznámek - S DEBUGOVÁNÍM
+ // Na začátek vašeho kódu pro počítání poznámek
+if (typeof notes === 'undefined' || notes === null) {
+    alert("Chyba: Proměnná 'notes' není definována nebo je null!");
+    // Vytvořit prázdný objekt, aby kód nespadl
+    notes = {};
+}
+console.log("Skript pro počítání poznámek se načítá");
+
+// Najít prvek tlačítka
+const countBtn = document.getElementById('count-notes-btn');
+console.log("Tlačítko pro počítání:", countBtn);
+
+// Přidat event listener s kontrolou
+if (countBtn) {
+    countBtn.addEventListener('click', function() {
+        console.log("Tlačítko pro počítání kliknuto");
+        
+        // Najít modální okno
+        const modal = document.getElementById('count-notes-modal');
+        console.log("Modální okno:", modal);
+        
+        if (modal) {
+            // Zobrazení modálního okna
+            modal.style.display = 'flex';
+            console.log("Modální okno by mělo být zobrazeno");
+            
+            // Nastavení výchozího časového období (celý aktuální měsíc)
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+            console.log("Vstupní pole pro data:", startDateInput, endDateInput);
+            
+            if (startDateInput && endDateInput) {
+                startDateInput.valueAsDate = firstDay;
+                endDateInput.valueAsDate = lastDay;
+            } else {
+                console.error("Vstupní pole pro data nebyla nalezena!");
+            }
+            
+            // Skrytí předchozího výsledku
+            const resultDiv = document.getElementById('count-result');
+            if (resultDiv) {
+                resultDiv.style.display = 'none';
+            } else {
+                console.error("Element pro výsledek nebyl nalezen!");
+            }
+        } else {
+            console.error("Modální okno nebylo nalezeno v DOM!");
+            alert("Chyba: Modální okno pro počítání poznámek neexistuje.");
+        }
+    });
+} else {
+    console.error("Tlačítko pro počítání poznámek nebylo nalezeno!");
+}
+
+// Zavření modálního okna
+const cancelBtn = document.getElementById('cancel-count');
+console.log("Tlačítko pro zavření:", cancelBtn);
+
+if (cancelBtn) {
+    cancelBtn.addEventListener('click', function() {
+        console.log("Tlačítko pro zavření kliknuto");
+        const modal = document.getElementById('count-notes-modal');
+        if (modal) {
+            modal.style.display = 'none';
+            console.log("Modální okno by mělo být skryto");
+        } else {
+            console.error("Modální okno nebylo nalezeno při zavírání!");
+        }
+    });
+} else {
+    console.error("Tlačítko pro zavření nebylo nalezeno!");
+}
+// Výpočet počtu poznámek
+document.getElementById('calculate-count').addEventListener('click', function() {
+    const searchText = document.getElementById('search-text').value.trim().toLowerCase();
+    const startDate = new Date(document.getElementById('start-date').value);
+    const endDate = new Date(document.getElementById('end-date').value);
+    
+    // Kontrola vstupních dat
+    if (!searchText) {
+        alert('Zadejte text pro vyhledávání.');
+        return;
+    }
+    
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        alert('Zadejte platné datum.');
+        return;
+    }
+    
+    if (startDate > endDate) {
+        alert('Datum "od" musí být dřívější než datum "do".');
+        return;
+    }
+    
+    // Výpočet počtu poznámek
+    let count = 0;
+    let matchingNotes = [];
+    
+    // Nastavení konce dne pro koncové datum
+    endDate.setHours(23, 59, 59, 999);
+    
+    // Procházení všech poznámek
+    for (const dateStr in notes) {
+        const noteDate = new Date(dateStr);
+        
+        // Kontrola, zda je datum v zadaném rozmezí
+        if (noteDate >= startDate && noteDate <= endDate) {
+            // Procházení poznámek pro tento den
+            notes[dateStr].forEach(note => {
+                // Kontrola, zda poznámka obsahuje hledaný text (v názvu nebo popisu)
+                if (note.title.toLowerCase().includes(searchText) || 
+                    (note.description && note.description.toLowerCase().includes(searchText))) {
+                    count++;
+                    matchingNotes.push({
+                        date: dateStr,
+                        title: note.title,
+                        color: note.color
+                    });
+                }
+            });
+        }
+    }
+    
+    // Zobrazení výsledku
+    const resultDiv = document.getElementById('count-result');
+    resultDiv.style.display = 'block';
+    
+    if (count > 0) {
+        let resultHTML = `<p><strong>Nalezeno ${count} poznámek obsahujících "${searchText}":</strong></p>`;
+        resultHTML += '<ul style="margin-top: 5px; padding-left: 20px;">';
+        
+        // Seřazení nalezených poznámek podle data
+        matchingNotes.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        // Zobrazení max. 10 položek
+        const displayNotes = matchingNotes.slice(0, 10);
+        
+        displayNotes.forEach(note => {
+            const date = new Date(note.date);
+            const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+            resultHTML += `<li style="margin-bottom: 5px;"><span style="color: ${note.color}; font-weight: bold;">■</span> ${formattedDate}: ${note.title}</li>`;
+        });
+        
+        if (matchingNotes.length > 10) {
+            resultHTML += `<li>... a dalších ${matchingNotes.length - 10} poznámek</li>`;
+        }
+        
+        resultHTML += '</ul>';
+        resultDiv.innerHTML = resultHTML;
+    } else {
+        resultDiv.innerHTML = `<p>Nenalezeny žádné poznámky obsahující "${searchText}" v zadaném období.</p>`;
+    }
+});
+</script>
+</body>
+</html>
