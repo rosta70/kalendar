@@ -1517,36 +1517,10 @@ document.getElementById('calculate-count').addEventListener('click', function() 
         resultDiv.innerHTML = `<p>Nenalezeny žádné poznámky obsahující "${searchText}" v zadaném období.</p>`;
     }
 });
-</script>
-<form action="odeslat_komentar.php" method="post">
-    <div>
-        <label for="comment">Váš komentář:</label><br>
-        <textarea id="comment" name="comment" rows="5" cols="30" required></textarea>
-    </div>
-    
-    <div>
-        <input type="submit" value="Odeslat komentář">
-    </div>
-</form>
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $comment = $_POST['comment'];
-    
-    $to = "rostav@gmail.com";
-    $subject = "Nový anonymní komentář";
-    $message = "Anonymní komentář: $comment";
-    $headers = "From: rostav@gmail.com";
-    
-    mail($to, $subject, $message, $headers);
-    
-    // Přesměrování po odeslání
-    header("Location: dekujeme.html");
-    exit();
-}
-?>
+
 <form action="https://formspree.io/f/xanenvww" method="POST">
     <div>
-        <label for="message">Váš komentář:</label><br>
+        <label for="message">Napiš jestli chceš něco změnit...</label><br>
         <textarea name="message" id="message" rows="5" cols="30" required></textarea>
     </div>
     
