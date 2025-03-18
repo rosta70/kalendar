@@ -1544,5 +1544,17 @@ document.getElementById('calculate-count').addEventListener('click', function() 
   <!-- your other form fields go here -->
   <button type="submit">Send</button>
 </form>
+
+<form action="odeslat_komentar.php" method="post">
+    <div>
+        <label for="comment">Váš komentář:</label><br>
+        <textarea id="comment" name="comment" rows="5" cols="30" required></textarea>
+    </div>
+    
+    <div>
+        <input type="submit" value="Odeslat komentář">
+    </div>
+</form>
+
 </body>
 </html>
