@@ -1532,10 +1532,10 @@ document.getElementById('calculate-count').addEventListener('click', function() 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $comment = $_POST['comment'];
     
-    $to = "vase-adresa@domena.cz";
+    $to = "rostav@gmail.com";
     $subject = "Nový anonymní komentář";
     $message = "Anonymní komentář: $comment";
-    $headers = "From: webovy-formular@vase-domena.cz";
+    $headers = "From: rostav@gmail.com";
     
     mail($to, $subject, $message, $headers);
     
