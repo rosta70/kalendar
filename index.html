@@ -1339,6 +1339,36 @@ document.querySelector('.calendar-container').addEventListener('touchend', e => 
     }
 }
 </script>
+
+<!-- Modální okno pro počítání poznámek -->
+<div id="count-notes-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background-color: white; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px;">
+        <h3>Počítání poznámek</h3>
+        
+        <div class="form-group">
+            <label for="search-text">Hledaný text:</label>
+            <input type="text" id="search-text" placeholder="Zadejte text pro vyhledávání">
+        </div>
+        
+        <div class="form-group">
+            <label for="start-date">Od:</label>
+            <input type="date" id="start-date">
+        </div>
+        
+        <div class="form-group">
+            <label for="end-date">Do:</label>
+            <input type="date" id="end-date">
+        </div>
+        
+        <div id="count-result" style="display: none; margin-top: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 4px;"></div>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <button id="calculate-count" class="btn">Spočítat</button>
+            <button id="cancel-count" class="btn" style="background-color: #f44336;">Zavřít</button>
+        </div>
+    </div>
+</div>
+
 <script>
   // Funkce pro počítání poznámek - S DEBUGOVÁNÍM
  // Na začátek vašeho kódu pro počítání poznámek
